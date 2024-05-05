@@ -1,0 +1,195 @@
+%!Adobe-FontList 1.23
+%Locale:0x409
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Invalid
+OutlineFileName:/Users/Emmanuel/Dropbox/ST GERVAIS/INDD/WEB/Dossier 240325_MSG-WEB/Document fonts/AdobeFnt23.lst
+FileLength:4093
+FileModTime:733065752
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:KTFConcrete-A-Bold
+FamilyName:KTF Concrete
+StyleName:A-Bold
+MenuName:KTF Concrete A-
+StyleBits:2
+WeightClass:700
+WidthClass:5
+AngleClass:0
+FullName:KTF Concrete A-Bold
+WritingScript:Roman
+OutlineFileName:/Users/Emmanuel/Dropbox/ST GERVAIS/INDD/WEB/Dossier 240325_MSG-WEB/Document fonts/KTFConcrete-A-Bold.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:69600
+FileModTime:719918088
+NameArray:0,Mac,4,KTF Concrete A-Bold
+NameArray:0,Win,1,KTF Concrete A-
+NameArray:0,Win,16,KTF Concrete
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:MakeLook-Regular
+FamilyName:Make Look
+StyleName:Regular
+MenuName:Make Look
+StyleBits:0
+WeightClass:400
+WidthClass:5
+AngleClass:0
+FullName:Make Look Regular
+WritingScript:Roman
+OutlineFileName:/Users/Emmanuel/Dropbox/ST GERVAIS/INDD/WEB/Dossier 240325_MSG-WEB/Document fonts/MakeLook-Regular.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:46524
+FileModTime:695559823
+NameArray:0,Mac,4,Make Look Regular
+NameArray:0,Win,1,Make Look
+NameArray:0,Win,16,Make Look
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:TrueType
+FontName:MetalShow
+FamilyName:MetalShow
+StyleName:Regular
+MenuName:MetalShow
+StyleBits:0
+WeightClass:400
+WidthClass:5
+AngleClass:0
+FullName:MetalShow
+WritingScript:Roman
+OutlineFileName:/Users/Emmanuel/Dropbox/ST GERVAIS/INDD/WEB/Dossier 240325_MSG-WEB/Document fonts/MetalShow.ttf
+DataFormat:sfntData
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:246464
+FileModTime:370025386
+NameArray:0,Mac,4,MetalShow
+NameArray:0,Win,1,MetalShow
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:MinionPro-Regular
+FamilyName:Minion Pro
+StyleName:Regular
+MenuName:Minion Pro
+StyleBits:0
+WeightClass:400
+WidthClass:5
+AngleClass:0
+FullName:Minion Pro
+WritingScript:Roman
+OutlineFileName:/Users/Emmanuel/Dropbox/ST GERVAIS/INDD/WEB/Dossier 240325_MSG-WEB/Document fonts/MinionPro-Regular.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:218640
+FileModTime:507649932
+DesignSize:110
+NameArray:0,Mac,4,Minion Pro
+NameArray:0,Win,1,Minion Pro
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:Selecta-Italic
+FamilyName:Selecta
+StyleName:Italic
+MenuName:Selecta
+StyleBits:1
+WeightClass:400
+WidthClass:5
+AngleClass:1
+FullName:Selecta Italic
+WritingScript:Roman
+OutlineFileName:/Users/Emmanuel/Dropbox/ST GERVAIS/INDD/WEB/Dossier 240325_MSG-WEB/Document fonts/Selecta-Italic.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:98368
+FileModTime:683193944
+NameArray:0,Mac,4,Selecta Italic
+NameArray:0,Win,1,Selecta
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:Selecta-Light
+FamilyName:Selecta
+StyleName:Light
+MenuName:Selecta Light
+StyleBits:0
+WeightClass:300
+WidthClass:5
+AngleClass:0
+FullName:Selecta Light
+WritingScript:Roman
+OutlineFileName:/Users/Emmanuel/Dropbox/ST GERVAIS/INDD/WEB/Dossier 240325_MSG-WEB/Document fonts/Selecta-Light.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:95692
+FileModTime:683193938
+NameArray:0,Mac,4,Selecta Light
+NameArray:0,Win,1,Selecta Light
+NameArray:0,Win,16,Selecta
+%EndFont
+
+%BeginFont
+Handler:DirectoryHandler
+FontType:Type1
+FontName:Selecta-Regular
+FamilyName:Selecta
+StyleName:Regular
+MenuName:Selecta
+StyleBits:0
+WeightClass:400
+WidthClass:5
+AngleClass:0
+FullName:Selecta Regular
+WritingScript:Roman
+OutlineFileName:/Users/Emmanuel/Dropbox/ST GERVAIS/INDD/WEB/Dossier 240325_MSG-WEB/Document fonts/Selecta-Regular.otf
+DataFormat:sfntData
+UsesStandardEncoding:yes
+isCFF:yes
+hasSVG:no
+hasCOLR:no
+VariableFontType:NonVariableFont
+FileLength:95628
+FileModTime:683193938
+NameArray:0,Mac,4,Selecta Regular
+NameArray:0,Win,1,Selecta
+%EndFont
+
