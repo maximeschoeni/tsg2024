@@ -58,85 +58,91 @@ class TSG_Posts extends TSG_Spectacles {
         'posts_per_page' => -1
       ));
 
-      foreach ($spectacle_query->posts as $spectacle) {
+      if ($spectacle_query->posts) {
 
-        $attachment_ids[] = get_post_meta($spectacle->ID, 'image', true);
-
-      }
-
-      require_once get_stylesheet_directory() . '/class-image.php';
-
-      if ($attachment_ids) {
-
-        Karma_Image::cache_images(array_values($attachment_ids));
+        $spectacles = $this->prepare_spectacles($spectacle_query->posts);
 
       }
 
-      foreach ($spectacle_query->posts as $spectacle) {
-
-        if (isset($shows[$spectacle->ID]['start'])) {
-
-          $start = $shows[$spectacle->ID]['start'];
-
-        } else {
-
-          $start = null;
-
-        }
-
-        if (isset($shows[$spectacle->ID]['end'])) {
-
-          $end = $shows[$spectacle->ID]['end'];
-
-        } else {
-
-          $end = $start;
-
-        }
-
-        $text_date = get_post_meta($spectacle->ID, 'text_date', true);
-
-        if (!$text_date && $start) {
-
-          if ($start === $end) {
-
-            $text_date = date_i18n('d F Y', strtotime($start));
-
-          } else {
-
-            $text_date = $this->format_date_range(strtotime($start), strtotime($end));
-
-          }
-
-        }
-
-        $image_id = get_post_meta($spectacle->ID, 'image', true);
-
-        if ($image_id) {
-
-          $image = Karma_Image::get_image_source($image_id);
-
-        } else {
-
-          $image = null;
-
-        }
-
-      }
-
-      $spectacles[] = array(
-        'id' => $spectacle->ID,
-        'title' => get_the_title($spectacle->ID),
-        'ticket' => '#',
-        'mediation' => '#',
-        'permalink' => get_permalink($spectacle->ID),
-        'subtitle' => get_post_meta($spectacle->ID, 'subtitle', true),
-        'description' => get_post_meta($spectacle->ID, 'description', true),
-        'image' => $image,
-        'date' => $text_date,
-        'start' => $start,
-        'end' => $end
-      );
+      // foreach ($spectacle_query->posts as $spectacle) {
+      //
+      //   $attachment_ids[] = get_post_meta($spectacle->ID, 'image', true);
+      //
+      // }
+      //
+      // require_once get_stylesheet_directory() . '/class-image.php';
+      //
+      // if ($attachment_ids) {
+      //
+      //   Karma_Image::cache_images(array_values($attachment_ids));
+      //
+      // }
+      //
+      // foreach ($spectacle_query->posts as $spectacle) {
+      //
+      //   if (isset($shows[$spectacle->ID]['start'])) {
+      //
+      //     $start = $shows[$spectacle->ID]['start'];
+      //
+      //   } else {
+      //
+      //     $start = null;
+      //
+      //   }
+      //
+      //   if (isset($shows[$spectacle->ID]['end'])) {
+      //
+      //     $end = $shows[$spectacle->ID]['end'];
+      //
+      //   } else {
+      //
+      //     $end = $start;
+      //
+      //   }
+      //
+      //   $text_date = get_post_meta($spectacle->ID, 'text_date', true);
+      //
+      //   if (!$text_date && $start) {
+      //
+      //     if ($start === $end) {
+      //
+      //       $text_date = date_i18n('d F Y', strtotime($start));
+      //
+      //     } else {
+      //
+      //       $text_date = $this->format_date_range(strtotime($start), strtotime($end));
+      //
+      //     }
+      //
+      //   }
+      //
+      //   $image_id = get_post_meta($spectacle->ID, 'image', true);
+      //
+      //   if ($image_id) {
+      //
+      //     $image = Karma_Image::get_image_source($image_id);
+      //
+      //   } else {
+      //
+      //     $image = null;
+      //
+      //   }
+      //
+      // }
+      //
+      // $spectacles[] = array(
+      //   'id' => $spectacle->ID,
+      //   'title' => get_the_title($spectacle->ID),
+      //   'ticket' => '#',
+      //   'mediation' => '#',
+      //   'permalink' => get_permalink($spectacle->ID),
+      //   'subtitle' => get_post_meta($spectacle->ID, 'subtitle', true),
+      //   'description' => get_post_meta($spectacle->ID, 'description', true),
+      //   'image' => $image,
+      //   'date' => $text_date,
+      //   'start' => $start,
+      //   'end' => $end
+      // );
 
     }
 

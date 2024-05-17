@@ -1,5 +1,5 @@
 /*
-Theme Name: TSG 2024 v1
+Theme Name: TSG 2024 v2
 Version: 1
 Text Domain: tsg
 */
@@ -10,21 +10,15 @@ Text Domain: tsg
 
 @font-face {
   font-family: "Selecta";
-  font-weight: 300;
+  font-weight: 400;
   font-style: normal;
-  src: url("fonts/Selecta-Light.otf");
+  src: url("fonts/Selecta-Regular.woff2");
 }
 @font-face {
   font-family: "Selecta";
   font-weight: 400;
   font-style: italic;
-  src: url("fonts/Selecta-Italic.otf");
-}
-@font-face {
-  font-family: "Selecta";
-  font-weight: 400;
-  font-style: italic;
-  src: url("fonts/Selecta-Italic.otf");
+  src: url("fonts/Selecta-Regular-Italic.woff2");
 }
 @font-face {
   font-family: "KTF Concrete";
@@ -145,7 +139,12 @@ main {
   right: 1em;
   z-index: 20;
 }
-
+.home-button {
+    position: fixed;
+    top: 1em;
+    left: 1em;
+    z-index: 20;
+}
 
 
 /* Nav
@@ -248,15 +247,18 @@ nav.menu .close svg {
   transform: translateX(100%);
 }
 
-.slideshow .slides .slide a {
-  /* display: flex;
+.home-slideshow .slides .slide a {
+  display: flex;
   flex-direction: column;
-  align-items: center; */
-
-  display: block;
+  align-items: center;
   width: 100%;
   height: 100%;
+
+  /* display: block;
+  width: 100%;
+  height: 100%; */
 }
+
 .slideshow .slides .slide figure {
   margin: 0;
   /* min-height: 0; */
@@ -266,6 +268,11 @@ nav.menu .close svg {
   /* display: flex; */
   /* flex-grow: 1; */
 }
+.home-slideshow .slides .slide a figure {
+  height: auto;
+  min-height: 0;
+  flex-grow: 1;
+}
 .slideshow .slides .slide figure img {
   display: block;
   width: 100%;
@@ -273,41 +280,22 @@ nav.menu .close svg {
   object-fit: contain;
   object-position: center;
 }
-.slideshow .nav .nav-left,
-.slideshow .nav .nav-right {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 25%;
-  height: 100%;
-  z-index: 10;
-}
-.slideshow .nav .nav-right {
-  left: 75%;
-}
-.slideshow .nav {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-
-}
-.slideshow .slides .slide h3 {
+.home-slideshow .slides .slide h3 {
   font-size: var(--home-h2);
   line-height: 1.2em;
   font-family: "KTF Concrete", Arial;
   color: var(--red);
   text-align: center;
   margin: 0.1em;
+  flex-shrink: 0;
 }
-.slideshow .slides .slide .date {
+.home-slideshow .slides .slide .date {
   font-size: var(--home-h4);
   line-height: 1.2em;
   font-family: "KTF Concrete", Arial;
   color: var(--green);
   margin-bottom: 2em;
+  flex-shrink: 0;
 }
 .slideshow .slides .slide h3,
 .slideshow .slides .slide .date {
@@ -320,6 +308,89 @@ nav.menu .close svg {
 }
 
 
+
+
+/* Home Slideshow
+---------------------------------------------------- */
+
+.home-slideshow .nav .nav-left,
+.home-slideshow .nav .nav-right {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 25%;
+  height: 100%;
+  z-index: 10;
+}
+.home-slideshow .nav .nav-right {
+  left: 75%;
+}
+.home-slideshow .nav {
+  /* position: absolute; */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+
+}
+
+.home-slideshow .overlays {
+  /* position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; */
+}
+.home-slideshow .overlay {
+  position: fixed;
+  z-index: 2;
+  left: -60em;
+  right: 0;
+  top: -18.75em;
+  bottom: 0;
+  background-size: 30em;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 800ms;
+
+  animation: move 1000ms 0ms linear infinite both;
+}
+.home-slideshow .overlay.active {
+  opacity: 1;
+}
+
+@keyframes move {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(60em, 18.75em);
+  }
+}
+
+
+.home-archives {
+  border: 1px solid black;
+  border-top: none;
+  margin: 0 2em;
+}
+.home-archives a {
+  display: block;
+  font-size: var(--home-h1);
+  line-height: 1.0em;
+  font-family: "KTF Concrete", Arial;
+  text-align: center;
+  margin: 0;
+  padding: 0.5em;
+  color: var(--red);
+}
+
+
+
+
+
 /* Spectacle Slideshow
 ---------------------------------------------------- */
 .spectacle-slideshow {
@@ -327,6 +398,15 @@ nav.menu .close svg {
   width: 100%;
   height: 60em;
   margin: 0 auto;
+}
+.spectacle-slideshow .nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+
 }
 .spectacle-slideshow .slides .slide {
   position: absolute;
@@ -404,7 +484,8 @@ nav.menu .close svg {
   max-width: 100em;
   margin: 1em auto;
 }
-.single-spectacle-page h2 {
+.single-spectacle-page h2,
+.single-spectacle-page .subtitle .description {
   font-size: var(--home-h3);
   line-height: 1.0em;
   font-family: "KTF Concrete", Arial;
@@ -490,7 +571,7 @@ nav.menu .close svg {
   padding: 0;
   vertical-align: top;
 }
-.single-spectacle-page .soutien p {
+.single-spectacle-page p {
   font-size: var(--text);
   line-height: 1.4em;
 }
@@ -568,7 +649,7 @@ button,
   border-radius: 3px;
   box-shadow: 0 0 2px black;
   text-align: center;
-  padding: 0.2em 0.5em;
+  padding: 0.2em 0.5em 0.1em;
   text-decoration: none !important;
 }
 button.loading,
@@ -576,11 +657,7 @@ button.loading,
   opacity: 0.4;
   pointer-events: none;
 }
-button.active,
-.button.active {
-  background-color: var(--red);
-  color: black;
-}
+
 
 /* Agenda
 ---------------------------------------------------- */
@@ -589,7 +666,7 @@ button.active,
   /* position: relative; */
 }
 .home-agenda {
-  padding: 0 1em;
+  padding: 0 2em;
 }
 /* .home-agenda {
   position: absolute;
@@ -650,7 +727,8 @@ button.active,
 }
 .list-body .spectacle-row {
   display: flex;
-  height: 22.3em;
+  /* height: 22.3em; */
+  height: 21.9375em;
   border-bottom: 1px solid black;
   background-color: white;
 }
@@ -662,6 +740,8 @@ button.active,
   width: 25%;
   border-right: 1px solid black;
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
 }
 .list-body .spectacle-row .media figure {
   display: flex;
@@ -674,11 +754,32 @@ button.active,
   object-fit: cover;
   object-position: center;
 }
+.list-body .spectacle-row .media .overlay {
+  background-size: 10em;
+  position: absolute;
+  top: -20em;
+  left: -60em;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+
+  opacity: 0;
+  transition: opacity 400ms;
+  animation: move 1600ms 0ms linear infinite both;
+}
+.list-body .spectacle-row.active .media .overlay,
+.list-body .spectacle-row:hover .media .overlay {
+  opacity: 1;
+}
+
+
+
 .list-body .spectacle-row .text {
   flex-grow: 1;
   display: flex;
 }
-.list-body .spectacle-row.active .text {
+.list-body .spectacle-row.active .text,
+.list-body .spectacle-row:hover .text {
   color: white;
   background-color: black;
 }
@@ -714,6 +815,20 @@ button.active,
   gap: 1em;
 }
 
+.list-body .spectacle-row.active button,
+.list-body .spectacle-row:hover button,
+.list-body .spectacle-row.active .button,
+.list-body .spectacle-row:hover .button {
+  color: black;
+}
+.list-body .spectacle-row.active button.primary,
+.list-body .spectacle-row:hover button.primary,
+.list-body .spectacle-row.active .button.primary,
+.list-body .spectacle-row:hover .button.primary {
+  background-color: var(--red);
+  color: black;
+}
+
 
 /* Calendar
 ---------------------------------------------------- */
@@ -744,7 +859,7 @@ button.active,
   position: relative;
 
   width: 14.2857%;
-  height: 13.1229em;
+  height: 12.5357em; /*13.1229em */
   border-right: 1px solid black;
   border-bottom: 1px solid black;
 
@@ -812,7 +927,7 @@ button.active,
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
 }
 .calendar-cell .shows .show h3.title {
@@ -1035,6 +1150,13 @@ body.blog {
   text-transform: uppercase;
 }
 .single-page h3 {
+  font-size: var(--page-h2);
+  line-height: 1.0em;
+  font-family: "KTF Concrete", Arial;
+  text-align: center;
+  margin: 1em 0;
+}
+.single-page h4 {
   text-transform: uppercase;
   font-size: var(--text);
   line-height: 1.2em;
@@ -1073,6 +1195,7 @@ body.blog {
   /* display: flex;
   justify-content: center; */
   position: relative;
+  margin-bottom: 2em;
 }
 .single-column .content .wp-caption img,
 .single-column figure img {
@@ -1122,7 +1245,7 @@ body.blog {
 }
 
 .single-column .content {
-  max-width: 100%;
+  width: 100%;
   min-width: 0;
 }
 
@@ -1261,7 +1384,10 @@ main.single-page.template-replique table tr:last-child td {
 .page-mediations section {
   padding: 1px 0;
 }
-
+.mediation-category-description p {
+  font-size: var(--text);
+  line-height: 1.2em;
+}
 
 
 /* Footer

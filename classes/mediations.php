@@ -12,7 +12,10 @@ class TSG_Mediations extends TSG_Spectacles {
 
     add_action('init', array($this, 'init'));
     add_action('edit_form_after_title', array($this, 'edit_form_after_title'));
+    add_action('edit_form_after_editor', array($this, 'edit_form_after_editor'));
+
     add_action('tsg_mediation_page', array($this, 'print_mediation_page'));
+
 
   }
 
@@ -140,18 +143,57 @@ class TSG_Mediations extends TSG_Spectacles {
             'type' => 'textarea',
             'key' => 'info',
             'height' => '9em'
+          )
+
+          // array(
+          //   'label' => 'Saison',
+          //   'type' => 'dropdown',
+          //   'key' => 'infomaniak',
+          //   'options' => array(array('id' => '', 'name' => '-')),
+          //   'driver' => 'taxonomy',
+          //   'params' => array('taxonomy' => 'infomaniak', 'orderby' => 'name', 'order' => 'desc')
+          // ),
+          // array(
+          //   'label' => 'Spectacles liés',
+          //   'type' => 'checkboxes',
+          //   'key' => 'parent_spectacle',
+          //   'columns' => 2,
+          //   'driver' => 'posts',
+          //   'params' => array(
+          //     'post_type' => 'spectacle',
+          //     'post_status' => 'any',
+          //     'infomaniak' => array('||', array('join', array('getValue', 'infomaniak'), ','), '99999999999'),
+          //     'orderby' => 'post_title',
+          //     'order' => 'asc'
+          //   )
+          // )
+
+        )
+      ));
+
+    }
+
+  }
+
+  /**
+   * @hook edit_form_after_editor
+   */
+  public function edit_form_after_editor($post) {
+
+    if ($post->post_type === 'mediation') {
+
+      do_action('karma_fields_post_field', $post->ID, array(
+        'hiddenfield' => false,
+        'children' => array(
+
+          array(
+            'label' => 'Saison',
+            'type' => 'dropdown',
+            'key' => 'infomaniak',
+            'options' => array(array('id' => '', 'name' => '-')),
+            'driver' => 'taxonomy',
+            'params' => array('taxonomy' => 'infomaniak', 'orderby' => 'name', 'order' => 'desc')
           ),
-          // array(
-          //   'label' => 'Image',
-          //   'type' => 'file',
-          //   'key' => '_thumbnail_id',
-          //   'uploader' => 'wp'
-          // ),
-          // array(
-          //   'label' => 'TEST',
-          //   'type' => 'text',
-          //   'content' => array('getValue', 'infomaniak')
-          // ),
           array(
             'label' => 'Spectacles liés',
             'type' => 'checkboxes',
@@ -247,7 +289,22 @@ class TSG_Mediations extends TSG_Spectacles {
 
       foreach ($spectacle_query->posts as $spectacle) {
 
-        $attachment_ids[] = get_post_meta($spectacle->ID, 'image', true);
+        // $attachment_ids[] = get_post_meta($spectacle->ID, 'image', true);
+        // $attachment_ids[] = get_post_meta($spectacle->ID, '_thumbnail_id', true);
+
+        $image_id = get_post_meta($spectacle->ID, 'image', true);
+
+        if (!$image_id) {
+
+          $image_id = get_post_meta($spectacle->ID, 'images', true);
+
+        }
+
+        if ($image_id) {
+
+          $attachment_ids[] = $image_id;
+
+        }
 
       }
 
@@ -354,6 +411,15 @@ class TSG_Mediations extends TSG_Spectacles {
         }
 
         $image_id = get_post_meta($spectacle->ID, 'image', true);
+        // $image_id = get_post_meta($spectacle->ID, '_thumbnail_id', true);
+
+        if (!$image_id) {
+
+          $image_id = get_post_meta($spectacle->ID, 'images', true);
+
+        }
+
+
 
         if ($image_id) {
 

@@ -47,7 +47,7 @@
 		<section class="mediation-category" id="section-<?php echo $term->slug; ?>">
 			<h2><?php echo $term->name; ?></h2>
 			<div class="mediation-column">
-				<div class="content mediation-category-description"><?php echo $term->description; ?></div>
+				<div class="content mediation-category-description"><p><?php echo $term->description; ?></p></div>
 			</div>
 			<?php if (isset($directory[$term->term_id]) && $directory[$term->term_id]) { ?>
 				<div class="mediation-category-items">

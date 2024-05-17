@@ -7,6 +7,8 @@
 
   $credits = get_post_meta($post->ID, 'credits');
   $soutien = get_post_meta($post->ID, 'soutien', true);
+  $detail = get_post_meta($post->ID, 'detail', true);
+
   $avertissement = get_post_meta($post->ID, 'avertissement', true);
   $atelier = null;
   $presses = get_post_meta($post->ID, 'presses');
@@ -78,7 +80,7 @@
       <div class="simple-content">
         <?php echo $simple; ?>
       </div>
-      <?php if ($credits || $soutien) { ?>
+      <?php if ($credits || $soutien || $detail) { ?>
         <div class="credits">
           <?php if ($credits) { ?>
             <table>
@@ -94,6 +96,11 @@
             <div class="soutien">
               <?php echo $soutien; ?>
             </div>
+          <?php } ?>
+          <?php if ($detail) { ?>
+            <p class="soutien">
+              <?php echo nl2br($detail); ?>
+            </p>
           <?php } ?>
         </div>
       <?php } ?>

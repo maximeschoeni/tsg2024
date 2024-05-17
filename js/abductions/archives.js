@@ -124,7 +124,7 @@ TSG.Archives = class extends TSG.Agenda {
             {
               tag: "button",
               init: element => {
-                element.innerHTML = "Q";
+                element.innerHTML = "🔎";
               },
               update: element => {
                 // search

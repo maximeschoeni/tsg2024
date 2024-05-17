@@ -20,15 +20,28 @@
           </figure>
           <h3 class="title"><?php echo $slide['title']; ?></h3>
           <div class="date"><?php echo $slide['date']; ?></div>
+
+
         </a>
       </div>
     <?php } ?>
   </div>
+  <div class="overlays">
+    <?php foreach ($slides as $slide) { ?>
+      <div
+        class="overlay"
+        <?php if ($slide['overlay']) { ?>
+          style="background-image: url(<?php echo $slide['overlay']; ?>)"
+        <?php } ?>
+      ></div>
+    <?php } ?>
+  </div>
+
   <div class="nav" id="slideshow-nav">
-    <!-- <div class="nav-left" id="nav-left">
+    <div class="nav-left" id="nav-left">
     </div>
     <div class="nav-right" id="nav-right">
-    </div> -->
+    </div>
   </div>
 </div>
 <script src="<?php echo get_stylesheet_directory_uri(); ?>/js/player-v5.js"></script>
@@ -42,45 +55,75 @@
     const viewer = container.querySelector(".slides");
     const items = [...viewer.children];
 
-    // const navLeft = document.getElementById("nav-left");
-    // const navRight = document.getElementById("nav-right");
+    const navLeft = document.getElementById("nav-left");
+    const navRight = document.getElementById("nav-right");
     const nav = document.getElementById("slideshow-nav");
 
-    const tracker = new Tracker(nav);
+    const overlays = container.querySelectorAll(".overlay");
 
-    tracker.onupdate = () => {
-      player.shift(tracker.diffX/tracker.box.width);
-    }
+    const useTracker = false;
 
-    tracker.oncomplete = () => {
-      if (tracker.swipeRight) {
-        // tracker.event.preventDefault();
-        player.prev();
-      } else if (tracker.swipeLeft) {
-        // tracker.event.preventDefault();
-        player.next();
-      } else if (tracker.swipeFail) {
-        // tracker.event.preventDefault();
-        player.offset = 0;
-        player.change(player.index);
-      } else if (tracker.click) {
-        // tracker.event.preventDefault();
-        if (tracker.nX > 0.75) {
-          player.next();
-        } else if (tracker.nX > 0.25) {
-          const a = items[player.index] && items[player.index].querySelector("a");
-          if (a) {
-            location.href = a.href;
-          }
-          // console.log(player.index, items[player.index]);
-        } else {
+    if (useTracker) {
+
+      const tracker = new Tracker(nav);
+
+      tracker.onupdate = () => {
+        player.shift(tracker.diffX/tracker.box.width);
+      }
+
+      tracker.oncomplete = () => {
+        if (tracker.swipeRight) {
+          // tracker.event.preventDefault();
           player.prev();
+        } else if (tracker.swipeLeft) {
+          // tracker.event.preventDefault();
+          player.next();
+        } else if (tracker.swipeFail) {
+          // tracker.event.preventDefault();
+          player.offset = 0;
+          player.change(player.index);
+        } else if (tracker.click) {
+          // tracker.event.preventDefault();
+          if (tracker.nX > 0.75) {
+            player.next();
+          } else if (tracker.nX > 0.25) {
+            const a = items[player.index] && items[player.index].querySelector("a");
+            if (a) {
+              location.href = a.href;
+            }
+            // console.log(player.index, items[player.index]);
+          } else {
+            player.prev();
+          }
         }
       }
+
+    } else {
+
+      navLeft.onclick = event => {
+        player.prev();
+      }
+      navRight.onclick = event => {
+        player.next();
+      }
+
+
     }
+
+
 
     for (let item of items) {
       player.add(item);
+    }
+
+    for (let i = 0; i < items.length; i++) {
+
+      items[i].onmouseenter = event => {
+        overlays[i].classList.add("active");
+      }
+      items[i].onmouseleave = event => {
+        overlays[i].classList.remove("active");
+      }
     }
 
     player.onShift = (element, index) => {

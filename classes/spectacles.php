@@ -37,6 +37,23 @@ class TSG_Spectacles {
 
     add_action('rest_api_init', array($this, 'rest_api_init'));
 
+    add_filter('karma_fields_posts_meta_sql', array($this, 'karma_fields_posts_meta_sql'), 10, 3);
+
+  }
+
+  /**
+	 * @filter 'karma_fields_posts_meta_sql'
+	 */
+  public function karma_fields_posts_meta_sql($sql, $ids, $ids_string) {
+    global $wpdb;
+
+    return "SELECT
+      meta_value AS 'value',
+      meta_key AS 'key',
+      post_id AS 'id'
+      FROM $wpdb->postmeta
+      WHERE post_id IN ($ids_string) AND meta_key != 'trash' ORDER BY meta_id";
+
   }
 
   /**
@@ -176,13 +193,28 @@ class TSG_Spectacles {
           'placeholder' => 'https://...'
         ),
 
+
         array(
-          'type' => 'files',
-          'label' => 'Vignette',
-          'max' => 1,
-          'key' => 'image',
-          'uploader' => 'wp',
-          'width' => 'auto'
+          'type' => 'group',
+          'display' => 'flex',
+          'children' => array(
+            array(
+              'type' => 'files',
+              'label' => 'Vignette',
+              'max' => 1,
+              'key' => 'image',
+              'uploader' => 'wp',
+              'width' => 'auto'
+            ),
+            array(
+              'type' => 'files',
+              'label' => 'Overlay',
+              'max' => 1,
+              'key' => 'overlay',
+              'uploader' => 'wp',
+              'width' => 'auto'
+            )
+          )
         ),
         array(
           'type' => 'files',
@@ -417,6 +449,200 @@ class TSG_Spectacles {
 
   }
 
+
+  public function prepare_spectacles($queried_spectacles) {
+    global $wpdb;
+
+    $output = array();
+
+    $attachment_ids = array();
+    $spectacle_ids = array();
+
+    foreach ($queried_spectacles as $spectacle) {
+
+      $spectacle_ids[] = $spectacle->ID;
+
+      $vignette = get_post_meta($spectacle->ID, 'image', true);
+      // $vignette = get_post_meta($spectacle->ID, '_thumbnail_id', true);
+
+      if (!$vignette) {
+
+        $vignette = get_post_meta($spectacle->ID, 'images', true);
+
+      }
+
+      if ($vignette) {
+
+        $attachment_ids[] = $vignette;
+
+      }
+
+
+      $overlay = get_post_meta($spectacle->ID, 'overlay', true);
+
+      if ($overlay) {
+
+        $attachment_ids[] = $overlay;
+
+      }
+
+    }
+
+    require_once get_stylesheet_directory() . '/class-image.php';
+
+    if ($attachment_ids) {
+
+      $attachment_ids = array_unique($attachment_ids);
+
+      Karma_Image::cache_images($attachment_ids);
+
+    }
+
+    $first_dates = array();
+    $last_dates = array();
+
+    if ($spectacle_ids) {
+
+      $ids = implode(',', array_map('intval', $spectacle_ids));
+
+      $results = $wpdb->get_results(
+        "SELECT spectacle_id, MIN(`date`) AS 'start', MAX(`date`) AS 'end'
+        FROM {$wpdb->prefix}shows
+        WHERE spectacle_id IN ($ids)
+        GROUP BY spectacle_id");
+
+      foreach ($results as $result) {
+
+        $first_dates[$result->spectacle_id] = $result->start;
+        $last_dates[$result->spectacle_id] = $result->end;
+
+      }
+
+      $mediations = array();
+
+      $mediation_query = new WP_Query(array(
+        'post_type' => 'mediation',
+        'post_status' => 'publish',
+        'meta_query' => array(
+          array(
+            'key' => 'parent_spectacle',
+            'value' => $spectacle_ids,
+            'compare' => 'IN'
+          )
+        )
+      ));
+
+
+      $mediation_page = home_url('place-publics');
+
+      foreach ($mediation_query->posts as $mediation) {
+
+        $parent_spectacle_ids = get_post_meta($mediation->ID, 'parent_spectacle');
+
+        foreach ($parent_spectacle_ids as $parent_spectacle_id) {
+
+          $mediations[$parent_spectacle_id][] = array(
+            'url' => "$mediation_page#mediation-{$mediation->post_name}",
+            'name' => get_the_title($mediation)
+          );
+
+        }
+
+      }
+
+    }
+
+    foreach ($queried_spectacles as $spectacle) {
+
+      $attachment_id = get_post_meta($spectacle->ID, 'image', true);
+      // $attachment_id = get_post_meta($spectacle->ID, '_thumbnail_id', true);
+
+      if (!$attachment_id) {
+
+        $attachment_id = get_post_meta($spectacle->ID, 'images', true);
+
+      }
+
+      if ($attachment_id) {
+
+        $image = Karma_Image::get_image_source($attachment_id);
+
+      } else {
+
+        $image = null;
+
+      }
+
+      $text_date = get_post_meta($spectacle->ID, 'text_date', true);
+
+      if (!$text_date && isset($first_dates[$spectacle->ID], $first_dates[$spectacle->ID])) {
+
+        $first_date = $first_dates[$spectacle->ID];
+        $last_date = $last_dates[$spectacle->ID];
+
+        if ($first_date === $last_date) {
+
+          $text_date = date_i18n('d F Y', strtotime($first_date));
+
+        } else {
+
+          $text_date = $this->format_date_range(strtotime($first_date), strtotime($last_date));
+
+        }
+
+      }
+
+      $overlay_id = get_post_meta($spectacle->ID, 'overlay', true);
+
+      if ($overlay_id) {
+
+        $overlay_url = wp_get_attachment_url($overlay_id);
+
+      } else {
+
+        $overlay_url = null;
+
+      }
+
+      $output[] = array(
+        'id' => $spectacle->ID,
+        'title' => $spectacle->post_title,
+        'permalink' => get_permalink($spectacle),
+        'image' => $image,
+        'date' => $text_date,
+        'overlay' => $overlay_url,
+
+        'ticket' => '#',
+        'mediation' => '#',
+
+        'mediations' => isset($mediations[$spectacle->ID]) ? $mediations[$spectacle->ID] : null,
+
+        'subtitle' => get_post_meta($spectacle->ID, 'subtitle', true),
+        'description' => get_post_meta($spectacle->ID, 'description', true),
+        'start' => isset($first_dates[$spectacle->ID]) ? $first_dates[$spectacle->ID] : null,
+        'end' => isset($last_dates[$spectacle->ID]) ? $last_dates[$spectacle->ID] : null
+      );
+
+      // $items[] = array(
+      //   'id' => $spectacle_id,
+      //   'title' => get_the_title($spectacle_id),
+      //   'ticket' => '#',
+      //   'mediation' => '#',
+      //   'permalink' => get_permalink($spectacle_id),
+      //   'subtitle' => get_post_meta($spectacle_id, 'subtitle', true),
+      //   'description' => get_post_meta($spectacle_id, 'description', true),
+      //   'image' => isset($images[$spectacle_id]) ? $images[$spectacle_id] : null,
+      //   'date' => $text_date,
+      //   'start' => $dates['start'],
+      //   'end' => $dates['end']
+      // );
+
+    }
+
+
+    return $output;
+  }
+
   /**
    * @hook tsg_home_slideshow
    */
@@ -446,92 +672,124 @@ class TSG_Spectacles {
 
       if ($slides_query->posts) {
 
-        $attachment_ids = array();
-        $spectacle_ids = array();
+        $slides = $this->prepare_spectacles($slides_query->posts);
 
-        foreach ($slides_query->posts as $spectacle) {
-
-          $spectacle_ids[] = $spectacle->ID;
-          $attachment_ids[] = get_post_meta($spectacle->ID, 'image', true);
-
-        }
-
-        require_once get_stylesheet_directory() . '/class-image.php';
-
-        if ($attachment_ids) {
-
-          Karma_Image::cache_images($attachment_ids);
-
-        }
-
-        $first_dates = array();
-        $last_dates = array();
-
-        if ($spectacle_ids) {
-
-          $ids = implode(',', array_map('intval', $spectacle_ids));
-
-          $results = $wpdb->get_results(
-            "SELECT spectacle_id, MIN(`date`) AS 'start', MAX(`date`) AS 'end'
-            FROM {$wpdb->prefix}shows
-            WHERE spectacle_id IN ($ids)
-            GROUP BY spectacle_id");
-
-          // echo '<pre>'; var_dump($results); die();
-
-          foreach ($results as $result) {
-
-            $first_dates[$result->spectacle_id] = $result->start;
-            $last_dates[$result->spectacle_id] = $result->end;
-
-          }
-
-        }
-
-        $slides = array();
-
-        foreach ($slides_query->posts as $spectacle) {
-
-          $attachment_id = get_post_meta($spectacle->ID, 'image', true);
-
-          if ($attachment_id) {
-
-            $image = Karma_Image::get_image_source($attachment_id);
-
-          } else {
-
-            $image = null;
-
-          }
-
-          $text_date = get_post_meta($spectacle->ID, 'text_date', true);
-
-          if (!$text_date && isset($first_dates[$spectacle->ID], $first_dates[$spectacle->ID])) {
-
-            $first_date = $first_dates[$spectacle->ID];
-            $last_date = $last_dates[$spectacle->ID];
-
-            if ($first_date === $last_date) {
-
-              $text_date = date_i18n('d F Y', strtotime($first_date));
-
-            } else {
-
-              $text_date = $this->format_date_range(strtotime($first_date), strtotime($last_date));
-
-            }
-
-          }
-
-          $slides[] = array(
-            'id' => $spectacle->ID,
-            'title' => $spectacle->post_title,
-            'permalink' => get_permalink($spectacle),
-            'image' => $image,
-            'date' => $text_date
-          );
-
-        }
+        // $attachment_ids = array();
+        // $spectacle_ids = array();
+        //
+        // foreach ($slides_query->posts as $spectacle) {
+        //
+        //   $spectacle_ids[] = $spectacle->ID;
+        //
+        //   $vignette = get_post_meta($spectacle->ID, 'image', true);
+        //
+        //   if ($vignette) {
+        //
+        //     $attachment_ids[] = $vignette;
+        //
+        //   }
+        //
+        //   $overlay = get_post_meta($spectacle->ID, 'overlay', true);
+        //
+        //   if ($overlay) {
+        //
+        //     $attachment_ids[] = $overlay;
+        //
+        //   }
+        //
+        //
+        //
+        // }
+        //
+        // require_once get_stylesheet_directory() . '/class-image.php';
+        //
+        // if ($attachment_ids) {
+        //
+        //   Karma_Image::cache_images($attachment_ids);
+        //
+        // }
+        //
+        // $first_dates = array();
+        // $last_dates = array();
+        //
+        // if ($spectacle_ids) {
+        //
+        //   $ids = implode(',', array_map('intval', $spectacle_ids));
+        //
+        //   $results = $wpdb->get_results(
+        //     "SELECT spectacle_id, MIN(`date`) AS 'start', MAX(`date`) AS 'end'
+        //     FROM {$wpdb->prefix}shows
+        //     WHERE spectacle_id IN ($ids)
+        //     GROUP BY spectacle_id");
+        //
+        //   // echo '<pre>'; var_dump($results); die();
+        //
+        //   foreach ($results as $result) {
+        //
+        //     $first_dates[$result->spectacle_id] = $result->start;
+        //     $last_dates[$result->spectacle_id] = $result->end;
+        //
+        //   }
+        //
+        // }
+        //
+        // $slides = array();
+        //
+        // foreach ($slides_query->posts as $spectacle) {
+        //
+        //   $attachment_id = get_post_meta($spectacle->ID, 'image', true);
+        //
+        //   if ($attachment_id) {
+        //
+        //     $image = Karma_Image::get_image_source($attachment_id);
+        //
+        //   } else {
+        //
+        //     $image = null;
+        //
+        //   }
+        //
+        //   $text_date = get_post_meta($spectacle->ID, 'text_date', true);
+        //
+        //   if (!$text_date && isset($first_dates[$spectacle->ID], $first_dates[$spectacle->ID])) {
+        //
+        //     $first_date = $first_dates[$spectacle->ID];
+        //     $last_date = $last_dates[$spectacle->ID];
+        //
+        //     if ($first_date === $last_date) {
+        //
+        //       $text_date = date_i18n('d F Y', strtotime($first_date));
+        //
+        //     } else {
+        //
+        //       $text_date = $this->format_date_range(strtotime($first_date), strtotime($last_date));
+        //
+        //     }
+        //
+        //   }
+        //
+        //   $overlay_id = get_post_meta($spectacle->ID, 'overlay', true);
+        //
+        //   if ($overlay_id) {
+        //
+        //     $overlay_url = wp_get_attachment_url($overlay_id);
+        //
+        //   } else {
+        //
+        //     $overlay_url = null;
+        //
+        //   }
+        //
+        //   $slides[] = array(
+        //     'id' => $spectacle->ID,
+        //     'title' => $spectacle->post_title,
+        //     'permalink' => get_permalink($spectacle),
+        //     'image' => $image,
+        //     'date' => $text_date,
+        //     'overlay' => $overlay_url
+        //   );
+        //
+        // }
 
         // echo '<pre>'; var_dump($first_dates, $last_dates, $slides); die();
 
@@ -750,7 +1008,21 @@ class TSG_Spectacles {
       foreach ($spectacles_query->posts as $spectacle) {
 
         $spectacle_ids[] = (int) $spectacle->ID;
-        $attachment_ids[$spectacle->ID] = get_post_meta($spectacle->ID, 'image', true);
+
+        $image_id = get_post_meta($spectacle->ID, 'image', true);
+        // $image_id = get_post_meta($spectacle->ID, '_thumbnail_id', true);
+
+        if (!$image_id) {
+
+          $image_id = get_post_meta($spectacle->ID, 'images', true);
+
+        }
+
+        if ($image_id) {
+
+          $attachment_ids[$spectacle->ID] = $image_id;
+
+        }
 
       }
 
@@ -886,93 +1158,96 @@ class TSG_Spectacles {
 
     if ($spectacles_query->posts) {
 
-      $spectacle_ids = array();
-      $attachment_ids = array();
-
-      foreach ($spectacles_query->posts as $spectacle) {
+      $items = $this->prepare_spectacles($spectacles_query->posts);
 
 
-
-        $spectacle_id = (int) $spectacle->ID;
-        $spectacle_ids[] = $spectacle_id;
-        $attachment_ids[$spectacle_id] = get_post_meta($spectacle_id, 'image', true);
-
-      }
-
-
-
-      require_once get_stylesheet_directory() . '/class-image.php';
-
-      if ($attachment_ids) {
-
-        Karma_Image::cache_images(array_values($attachment_ids));
-
-      }
-
-      $images = array();
-
-      foreach ($attachment_ids as $spectacle_id => $attachment_id) {
-
-        if ($attachment_id) {
-
-          $images[$spectacle_id] = Karma_Image::get_image_source($attachment_id);
-
-        }
-
-      }
-
-      $ids = implode(',', array_map('intval', $spectacle_ids));
-
-      $show_results = $wpdb->get_results(
-        "SELECT spectacle_id, MIN(`date`) AS 'start', MAX(`date`) AS 'end'
-        FROM {$wpdb->prefix}shows
-        WHERE trash = 0 AND spectacle_id IN ($ids)
-        GROUP BY spectacle_id
-        ORDER BY MAX(`date`) DESC"
-      );
-
-      $shows = array();
-
-      foreach ($show_results as $show_result) {
-
-        $shows[$show_result->spectacle_id]['start'] = $show_result->start;
-        $shows[$show_result->spectacle_id]['end'] = $show_result->end;
-
-      }
-
-      foreach ($shows as $spectacle_id => $dates) {
-
-        $text_date = get_post_meta($spectacle_id, 'text_date', true);
-
-        if (!$text_date) {
-
-          if ($dates['start'] === $dates['end']) {
-
-            $text_date = date_i18n('d F Y', strtotime($dates['start']));
-
-          } else {
-
-            $text_date = $this->format_date_range(strtotime($dates['start']), strtotime($dates['end']));
-
-          }
-
-        }
-
-        $items[] = array(
-          'id' => $spectacle_id,
-          'title' => get_the_title($spectacle_id),
-          'ticket' => '#',
-          'mediation' => '#',
-          'permalink' => get_permalink($spectacle_id),
-          'subtitle' => get_post_meta($spectacle_id, 'subtitle', true),
-          'description' => get_post_meta($spectacle_id, 'description', true),
-          'image' => isset($images[$spectacle_id]) ? $images[$spectacle_id] : null,
-          'date' => $text_date,
-          'start' => $dates['start'],
-          'end' => $dates['end']
-        );
-
-      }
+      // $spectacle_ids = array();
+      // $attachment_ids = array();
+      //
+      // foreach ($spectacles_query->posts as $spectacle) {
+      //
+      //
+      //
+      //   $spectacle_id = (int) $spectacle->ID;
+      //   $spectacle_ids[] = $spectacle_id;
+      //   $attachment_ids[$spectacle_id] = get_post_meta($spectacle_id, 'image', true);
+      //
+      // }
+      //
+      //
+      //
+      // require_once get_stylesheet_directory() . '/class-image.php';
+      //
+      // if ($attachment_ids) {
+      //
+      //   Karma_Image::cache_images(array_values($attachment_ids));
+      //
+      // }
+      //
+      // $images = array();
+      //
+      // foreach ($attachment_ids as $spectacle_id => $attachment_id) {
+      //
+      //   if ($attachment_id) {
+      //
+      //     $images[$spectacle_id] = Karma_Image::get_image_source($attachment_id);
+      //
+      //   }
+      //
+      // }
+      //
+      // $ids = implode(',', array_map('intval', $spectacle_ids));
+      //
+      // $show_results = $wpdb->get_results(
+      //   "SELECT spectacle_id, MIN(`date`) AS 'start', MAX(`date`) AS 'end'
+      //   FROM {$wpdb->prefix}shows
+      //   WHERE trash = 0 AND spectacle_id IN ($ids)
+      //   GROUP BY spectacle_id
+      //   ORDER BY MAX(`date`) DESC"
+      // );
+      //
+      // $shows = array();
+      //
+      // foreach ($show_results as $show_result) {
+      //
+      //   $shows[$show_result->spectacle_id]['start'] = $show_result->start;
+      //   $shows[$show_result->spectacle_id]['end'] = $show_result->end;
+      //
+      // }
+      //
+      // foreach ($shows as $spectacle_id => $dates) {
+      //
+      //   $text_date = get_post_meta($spectacle_id, 'text_date', true);
+      //
+      //   if (!$text_date) {
+      //
+      //     if ($dates['start'] === $dates['end']) {
+      //
+      //       $text_date = date_i18n('d F Y', strtotime($dates['start']));
+      //
+      //     } else {
+      //
+      //       $text_date = $this->format_date_range(strtotime($dates['start']), strtotime($dates['end']));
+      //
+      //     }
+      //
+      //   }
+      //
+      //   $items[] = array(
+      //     'id' => $spectacle_id,
+      //     'title' => get_the_title($spectacle_id),
+      //     'ticket' => '#',
+      //     'mediation' => '#',
+      //     'permalink' => get_permalink($spectacle_id),
+      //     'subtitle' => get_post_meta($spectacle_id, 'subtitle', true),
+      //     'description' => get_post_meta($spectacle_id, 'description', true),
+      //     'image' => isset($images[$spectacle_id]) ? $images[$spectacle_id] : null,
+      //     'date' => $text_date,
+      //     'start' => $dates['start'],
+      //     'end' => $dates['end']
+      //   );
+      //
+      // }
 
     }
 

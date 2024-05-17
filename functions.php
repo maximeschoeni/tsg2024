@@ -4,7 +4,7 @@
 
 class TSG {
 
-	var $version = '004';
+	var $version = '005';
 
 	/**
 	 *	Constructor

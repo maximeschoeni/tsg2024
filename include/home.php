@@ -24,4 +24,7 @@
   </script>
   <?php do_action('tsg_home_slideshow'); ?>
   <?php do_action('tsg_home_agenda'); ?>
+  <div class="home-archives">
+    <a href="<?php echo home_url('archives'); ?>"><?php echo __('Archives', 'tsg'); ?></a>
+  </div>
 </main>

@@ -129,7 +129,7 @@ TSG.Agenda = class extends TSG.Calendar {
             {
               tag: "button",
               init: element => {
-                element.innerHTML = "Q";
+                element.innerHTML = "🔎";
               },
               update: element => {
                 // search
@@ -179,8 +179,22 @@ TSG.Agenda = class extends TSG.Calendar {
                   class: "media",
                   update: element => {
                     element.href = spectacle.permalink;
+                    // const isActive = Boolean(this.todayFlag && spectacle.start <= now && spectacle.end >= now);
+                    // element.classList.toggle("active", isActive);
                   },
-                  children: this.buildMedia(spectacle.image)
+                  children: [
+                    {
+                      class: "overlay",
+                      update: element => {
+                        if (spectacle.overlay) {
+                          element.style.backgroundImage = `url(${spectacle.overlay})`;
+                        } else {
+                          element.style.backgroundImage = "none";
+                        }
+                      }
+                    },
+                    ...this.buildMedia(spectacle.image)
+                  ]
                 },
                 {
                   class: "text",
@@ -219,13 +233,11 @@ TSG.Agenda = class extends TSG.Calendar {
                       children: [
                         {
                           tag: "a",
-                          class: "button",
+                          class: "button primary",
                           init: element => {
                             element.innerHTML = "Infos";
                           },
                           update: element => {
-                            const isActive = Boolean(this.todayFlag && spectacle.start <= now && spectacle.end >= now);
-                            element.classList.toggle("active", isActive);
                             element.href = spectacle.permalink;
                           }
                         },
@@ -236,9 +248,16 @@ TSG.Agenda = class extends TSG.Calendar {
                           }
                         },
                         {
-                          tag: "button",
+                          tag: "a",
+                          class: "button",
                           init: element => {
                             element.innerHTML = "Écoles";
+                          },
+                          update: element => {
+                            element.classList.toggle("hidden", !spectacle.mediations || spectacle.mediations.length === 0);
+                            if (spectacle.mediations && spectacle.mediations.length) {
+                              element.href = spectacle.mediations[0].url;
+                            }
                           }
                         }
                       ]

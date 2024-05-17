@@ -1,6 +1,6 @@
 <?php get_header(); ?>
 <body class="single-spectacle">
-  <?php include get_stylesheet_directory().'/include/header.php'; ?>
+  <?php include get_stylesheet_directory().'/include/header-single.php'; ?>
 
   <?php
 

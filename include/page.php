@@ -56,7 +56,7 @@
 							button.onclick = event => {
 								event.preventDefault();
 								const hash = button.hash.slice(1);
-								const section = document.getElementById(`section-${hash}`);
+								const section = document.getElementById(hash);
 								scrollTo({
 									top: section.offsetTop,
 									behavior: "smooth"
@@ -81,7 +81,7 @@
 								$template = substr($template, 0, -4);
 							}
 						?>
-						<section class="<?php echo $template; ?>" id="section-<?php echo $subpage->post_name; ?>">
+						<section class="<?php echo $template; ?>" id="<?php echo $subpage->post_name; ?>">
 							<h2><?php echo get_the_title($subpage); ?></h2>
 							<div class="single-column">
 								<?php if (isset($image)) { ?>

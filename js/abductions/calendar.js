@@ -186,6 +186,10 @@ TSG.Calendar = class {
               element.width = media.width;
               element.height = media.height;
               element.draggable = false;
+              element.muted = true;
+              element.loop = true;
+              element.autoplay = true;
+              element.playinline = true;
             }
           }
         }
@@ -286,7 +290,7 @@ TSG.Calendar = class {
             {
               tag: "button",
               init: element => {
-                element.innerHTML = "Q";
+                element.innerHTML = "🔎";
               },
               update: element => {
                 // search
